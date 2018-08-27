@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+<body>
+	<div id="app">
+		<router-link to='/'>go home </router-link>
+		<br>
+		<router-link to='/foo'>go foo</router-link>
+		<br>
+ 
+		<router-link :to="{path:'/foo',query:{userid:'00000'}}">active(这个是path+query传递的值) </router-link>
+		<br>
+		<router-link :to="{name:'Active',params:{userid:'我是name+params传过来的'}}">这个是name+params。Router-link：</router-link>
+		<br>
+		<button @click='goBack'>返回</button>
+		<button @click='handleClick'>GO active</button>
+		<router-view></router-view>
+	</div>
+	<script>
+		/**
+		**除了使用router-link创建a标签来跳转，我们还可以使用roter的实例方法，使用router.push(location,onComplete?,onAbort?)来跳转访问，这个方法会向 history 栈添加一个新的记录，所以，当用户点击浏览器后退按钮时，则回到之前的 URL。
+		当你点击 <router-link> 时，这个方法会在内部调用，所以说，点击 <router-link :to="..."> 等同于调用 router.push(...)；
+		router-link 使用此方法跳转属于声明式，router.push()属于编程式。该方法的参数可以是一个字符串路径，或者一个描述地址的对象。
+
+		**
+		// 字符串
+		router.push('home')
+
+		// 对象
+		router.push({ path: 'home' })
+
+		// 命名的路由
+		router.push({ name: 'user', params: { userId: 123 }})
+
+		// 带查询参数，变成 /register?plan=private
+		router.push({ path: 'register', query: { plan: 'private' }})
+		注意：如果提供了 path，params 会被忽略，上述例子中的 query 并不属于这种情况。取而代之的是下面例子的做法，你需要提供路由的 name 或手写完整的带有参数的 path：
+		const userId = 123
+		router.push({ name: 'user', params: { userId }}) // -> /user/123
+		router.push({ path: `/user/${userId}` }) // -> /user/123
+		// 这里的 params 不生效
+		router.push({ path: '/user', params: { userId }}) // -> /user
+		而且使用了params后，传递的参数不会显示在地址栏，那么渲染组件时候，
+		同样的规则也适用于 router-link 组件的 to 属性。
+		比如从一个用户资料到另一个 /users/1 -> /users/2)，你需要使用 beforeRouteUpdate 来响应这个变化 (比如抓取用户信息)。
+		**/
+
+		// 路由的两种形式
+		// 1.   abc?articleId=asdfasdf   abc    query 
+		// 2.   abc/asdfsdfasdf    abc/:aritcleId  params{aritcleId:asdfsadf}
+		// 	abc/xxx/ff/xxx/xxx
+		// 	abc/?articeid=xx&pagestart=xxx&ddd=xxx
+
+		const Foo = {template:'<div>Hi,i\'mTimo {{this.$route.query.userid}}</div>'}
+		const Active = {template:`<div>hello world {{this.$route.params.userid}} {{this.$route.query.userid}}</div>`}
+		const router = new VueRouter({
+			routes:[
+				{
+					path:'/',
+				},
+				{
+					path:'/foo',
+					component:Foo
+				},
+				{
+					name:'Active',
+					path:'/active/:userid',
+					component:Active
+				}
+			]
+
+			
+		})
+		new Vue({
+			router,
+			created:function(){
+				console.log(this.$route)
+			},
+			methods:{
+				goBack(){
+					console.log(window.history)
+					console.log(this.$router)
+					window.history.length>1? this.$router.go(-1):this.$router.push('/')
+				},
+				handleClick(){
+					// this.$router.push({path:'/active',params:{userid:'001'}}) 因为这个直接写的path，那么params参数直接被忽略掉。
+					 // this.$router.push({path:'active',query:{userid:'001'}})
+					 //如果使用query传参方式，那么就需要this.$router.query.userid来接,并且参数会在地址栏显示。
+					this.$router.push({ name: 'Active', params: { userid:'001' }})
+				},
+			},
+			watch:{
+				'$route'(to,from){
+					console.log(to)
+				}
+			}
+		}).$mount("#app")
+	</script>
+</body>
+</html>

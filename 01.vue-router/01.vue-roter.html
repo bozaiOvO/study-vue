@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+<body>
+	<div id="app">
+		<router-link to='/'>go home </router-link>
+		<br>
+		<router-link to='/foo'>go foo</router-link>
+		<br>
+		<router-link to='/active'>active </router-link>
+		<br>
+		<button @click='goBack'>返回</button>
+		<button @click='handleClick'>GO active</button>
+		<router-view></router-view>
+	</div>
+	<script>
+		const Foo = {template:'<div>Hi,i\'mTimo</div>'}
+		const Active = {template:`<div>hello world {{this.$route.params.userid}}</div>`}
+		const router = new VueRouter({
+			routes:[
+				{
+					path:'/',
+				},
+				{
+					path:'/foo',
+					component:Foo
+				},
+				{
+					name:'Active',
+					path:'/active',
+					component:Active
+				}
+			]
+
+			
+		})
+		new Vue({
+			router,
+			created:function(){
+				console.log(this.$route)
+			},
+			methods:{
+				goBack(){
+					console.log(window.history)
+					console.log(this.$router)
+					window.history.length>1? this.$router.go(-1):this.$router.push('/')
+				},
+				handleClick(){
+					this.$router.push({name:'Active',params:{userid:'001'}})
+				}
+			}
+		}).$mount("#app")
+	</script>
+</body>
+</html>

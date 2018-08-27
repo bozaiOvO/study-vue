@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
+</head>
+<body>
+	<div id="app">
+		<router-link to='/'>go home </router-link>
+		<br>
+		<router-link to='/userId/001'>go id 1</router-link>
+		<router-link to='/userId/002/'>go id 2</router-link>
+		<br>
+		<router-link to='/user/Tom/post/1'>go nameAndId</router-link>
+		<br>
+		<router-link to='/active'>active </router-link>
+		<br>
+		<button @click='goBack'>返回</button>
+		<button @click='handleClick'>GO active</button>
+		<router-view></router-view>
+	</div>
+	<script>
+		/**
+		**当我们有一个用户组件，想匹配不同ID的用户，都是使用同一个组件渲染，那么我们可以在vue-router里面使用动态路由传参来达到这个效果。
+		在router 路径里使用:id，当匹配到一个路由的时候，参数会被设置到this.$route.params中，那么我们也可以通过this.$route.params来获取并且输出到这个模板。
+		这样的好处就是原组件实例会被复用，因为两个路由同时渲染同一个组件，比起销毁在创建更加的高效，但是这样一来，组件的生命钩子在重新渲染的时候不会被调用。
+		当然如果你想对路由的参数而做出对应的变化时候，可以选择watch来监听$route对象或者是beforeRouteUpdate。
+		**    
+		**/
+		const User = {template:'<div>Hi,i\'m {{this.$route.params.username}} My Id\'s{{this.$route.params.id}}</div>'}
+		const Active = {template:`<div>hello world {{this.$route.params.userid}}</div>`}
+		const router = new VueRouter({
+			routes:[
+				{
+					path:'/',
+				},
+				{
+					path:'/userId/:id',
+					component:User
+				},
+				{
+					name:'Active',
+					path:'/active',
+					component:Active
+				},
+				//多段路由。
+				{
+					name:'more',
+					path:'/user/:username/post/:id',
+					component:User
+				}
+			]
+
+			
+		})
+		new Vue({
+			router,
+			created:function(){
+				console.log(this.$route)
+			},
+			methods:{
+				goBack(){
+					console.log(window.history)
+					console.log(this.$router)
+					window.history.length>1? this.$router.go(-1):this.$router.push('/')
+				},
+				handleClick(){
+					this.$router.push({name:'Active',params:{userid:'001'}})
+				}
+			},
+			beforeRouteUpdate:function(to,from,next){
+				console.log('to')
+					if(to.name=='more'){
+						next()
+						console.log('true')
+					}else{
+						console.log('false')
+						next(false)
+					}				
+			},
+			// watch:{
+			// 	'$route'(to,from){
+			// 		if(to.name=='more'){
+			// 			alert('fff')
+			// 		}
+			// 		console.log(from)
+			// 	}
+			// }
+		}).$mount("#app")
+	</script>
+</body>
+</html>
