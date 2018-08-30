@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+<body>
+	<div id="app">
+		<router-link to='/user/001'>用户001</router-link>
+		<br>
+		<router-link to='/'>恢复</router-link>
+		<br>
+		<router-link :to="{path:'/goodNight',query:{name:'bozai'}}">这个是path传的！</router-link>
+		<div class="hi" @click='handleClickAdd'>
+			点击我给路由传至。
+		</div>
+		<router-view></router-view>
+	</div>
+	<script> 
+		let User = {template:`<div>my id is {{this.$route.params.id}}
+		<router-link to='/user/12/name'>名字</router-link>
+		<router-view></router-view>
+		</div>`};
+		let goodNight = {
+			template:`<div>good night {{this.$route.query.name}}</div>`
+		}
+		let UserName = {template:`<div>你看到我开心吗</div>`}
+		let router = new VueRouter({
+			routes:[
+				{
+					path:"/"
+				},
+				{
+					name:User,
+					path:'/user/:id',
+					component:User,
+					children:[
+						{
+							path:'name',
+							component:UserName
+						}
+					]
+				},
+				{
+					path:'/goodNight',
+					component:goodNight
+				}
+			]
+		})
+		new Vue({
+			el:'#app',
+			router,
+			methods:{
+				handleClickAdd(){
+					router.push({
+						name:User,
+						params:{
+							id:'111'
+						}
+					})
+				}
+			}
+		})
+	</script>
+</body>
+</html>

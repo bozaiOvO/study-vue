@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+</head>
+<body>
+	<div id="app">
+		<router-link to='user/001'>用户001</router-link>
+		<br>
+		<router-link to='/'>恢复</router-link>
+		<router-view></router-view>
+	</div>
+	<script> 
+		let User = {template:`<div>my id is {{this.$route.params.id}}</div>`}
+		let router = new VueRouter({
+			routes:[
+				{
+					path:"/"
+				},
+				{
+					path:'/user/:id',
+					component:User
+				}
+			]
+		})
+		new Vue({
+			el:'#app',
+			router
+		})
+	</script>
+</body>
+</html>
